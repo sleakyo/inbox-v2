@@ -302,12 +302,18 @@
     async function handleChatUpdate(payload) {
       if (payload.new.placement == 'admin') return;
 
-      // Check for human handoff request (agent_requested changed from false to true)
       if (payload.old.agent_requested === false && payload.new.agent_requested === true) {
-        // Show notification for human handoff request
-        const endUserEmail = payload.new.enduser_email || '';
-        const notificationBody = endUserEmail ? `Email: ${endUserEmail}` : 'No email provided';
-
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        let notificationBody = 'No email provided';
+        if (payload.new.visitor_id) {
+          const { version, client: supabase } = await Wized.requests.getClient('supabase');
+          const { data: visitor } = await supabase
+            .from('visitors')
+            .select('email')
+            .eq('id', payload.new.visitor_id)
+            .single();
+          if (visitor?.email) notificationBody = `Email: ${visitor.email}`;
+        }
         showNotification('Nieuwe human handoff in Sleak', notificationBody, payload.new.id);
       }
 
@@ -335,7 +341,7 @@
         // console.log('💩💩💩 Chat not found in allchats, adding tu updatedChats:', payload.new.id);
 
         // Check if any of the important properties have changed
-        const relevantProperties = ['agent_requested', 'livechat', 'open', 'processed', 'enduser_email', 'updated_at'];
+        const relevantProperties = ['agent_requested', 'livechat', 'open', 'processed', 'updated_at'];
         let hasRelevantChanges = false;
 
         relevantProperties.forEach(prop => {

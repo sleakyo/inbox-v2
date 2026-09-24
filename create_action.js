@@ -74,7 +74,7 @@
     ],
     picqer: [
       { name: 'base_url', label: 'Base URL', type: 'text', required: true, placeholder: 'https://your-picqer-url.com' },
-      { name: 'username', label: 'API Key', type: 'text', required: true, placeholder: 'your-api-key' }
+      { name: 'username', label: 'API Key', type: 'password', required: true, placeholder: 'your-api-key' }
     ],
     monta: [
       { name: 'username', label: 'Username', type: 'text', required: true, placeholder: 'your-username' },
@@ -145,6 +145,7 @@
         }
       }
       wrapper.appendChild(clone);
+      if (input) input.type = field.type;
     });
   };
 
